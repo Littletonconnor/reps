@@ -2,21 +2,26 @@ import { db, routineExercises, workouts, sets } from './index';
 import { eq, desc, count, and } from 'drizzle-orm';
 
 export async function getTodaysWorkout() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const routine = await db.query.routines.findFirst({
+  const nextWorkout = await db.query.workouts.findFirst({
+    where: eq(workouts.completed, false),
     with: {
-      routineExercises: {
+      routine: {
         with: {
-          exercise: true,
+          routineExercises: {
+            with: {
+              exercise: true,
+            },
+            orderBy: (routineExercises, { asc }) => [
+              asc(routineExercises.order),
+            ],
+          },
         },
-        orderBy: (routineExercises, { asc }) => [asc(routineExercises.order)],
       },
     },
+    orderBy: [workouts.date], // Get the earliest scheduled one
   });
 
-  return routine;
+  return nextWorkout;
 }
 
 export async function getRoutines() {

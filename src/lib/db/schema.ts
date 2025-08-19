@@ -37,6 +37,7 @@ export const routineExercises = sqliteTable('routine_exercises', {
 
 export const workouts = sqliteTable('workouts', {
   id: integer('id').primaryKey({ autoIncrement: true }),
+  name: text('name'),
   routineId: integer('routine_id').references(() => routines.id),
   date: integer('date', { mode: 'timestamp' })
     .notNull()
